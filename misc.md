@@ -1,7 +1,5 @@
 # mcp.js
-Thank you for adding that! Having the actual `mcp.js` code reveals exactly how NGINX handles the parsing under the hood, and it corrects some general assumptions about how the metadata is extracted. 
-
-Now that we can see the code, we can observe that NGINX is doing something much smarter and more efficient than just brute-force parsing every single JSON response. Here is exactly how the `njs` script handles the traffic:
+how the `njs` script handles the traffic:
 
 **1. Tool Name Extraction (Parsing the Request, Not the Response)**
 To find out which tool the AI is calling, NGINX does not wait for the server's response. Instead, it inspects the incoming client request payload using `JSON.parse(r.requestText || '{}')`. It checks if the JSON-RPC `method` is set to `tools/call`; if it is, it instantly extracts the tool name from `body.params.name`. 
@@ -18,6 +16,3 @@ The script utilizes an internal `has_error(r)` function that evaluates the parse
 
 **5. Header Manipulation for Streaming**
 Because the script intercepts and inspects streaming SSE responses, it includes an `mcp_header_filter` function that explicitly deletes the `Content-Length` header (`delete r.headersOut['Content-Length'];`). This is a critical requirement when a proxy deals with chunked or streaming data, as the final length isn't known upfront.
-
-**Why this is great for your tech talk:**
-You can actually use this to highlight NGINX's efficiency! You can tell the audience: *"NGINX isn't just doing heavy, brute-force JSON parsing on every byte. It smartly extracts the tool name from the request payload, manages the streaming SSE chunks by splitting the `\n\n` delimiters, and tracks client identity instantly using HTTP session headers and native NGINX shared memory."*
