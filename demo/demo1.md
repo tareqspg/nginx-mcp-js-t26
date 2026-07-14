@@ -28,7 +28,7 @@ data: {"jsonrpc":"2.0","id":1,"result":{
   "isError":true             ← the actual failure, buried
 }}
 ```
-### Send 50 requests to flaky mcp server
+## Send 50 requests to flaky mcp server
 Flaky server is with 2% protocol + 10% tool error rates
 ```sh
 for i in {1..50}; do
@@ -71,16 +71,16 @@ done | sort | uniq -c
 
 
 
-
+## Extra
 
 3. Making "HTTP 200 hides tool errors" tangible
 This is the money shot of the whole project and yes — you can make it viscerally visible. Two ways, one quick and one thorough.
 The quick way — docker logs diff. With the demo running, open two terminals side by side and compare what each layer sees:
 bash
-# Terminal A: what NGINX's access log sees (HTTP layer)
+### Terminal A: what NGINX's access log sees (HTTP layer)
 docker compose logs -f nginx | grep -E "POST|status"
 
-# Terminal B: what the mcp-client itself reports (MCP layer)  
+### Terminal B: what the mcp-client itself reports (MCP layer)  
 docker compose logs -f mcp-client | grep Errors
 Terminal A will show a firehose of 200 OK responses. Terminal B will show Errors: (0/55/0/0) climbing. Same requests. Two completely different accounts of what happened.
 To make this even sharper, you can query the demo's actual data with a curl while it's running:
