@@ -10,6 +10,24 @@ docker compose logs -f nginx | grep -E "POST|status"
 docker compose logs -f mcp-client | grep Errors
 ```
 
+query the demo's actual data with a curl while it's running:
+```sh
+# Fire a single call to the flaky server and inspect the response body
+curl -si -X POST http://localhost:9000/mcp-flaky \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call",
+       "params":{"name":"query_db","arguments":{}}}'
+# Run it 20 times. About 1 in 10 responses will come back like:
+HTTP/1.1 200 OK              ← NGINX is happy
+Content-Type: text/event-stream
+
+event: message
+data: {"jsonrpc":"2.0","id":1,"result":{
+  "content":[{"type":"text","text":"database timeout"}],
+  "isError":true             ← the actual failure, buried
+}}
+```
 
 
 
