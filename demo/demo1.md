@@ -1,5 +1,14 @@
 # Demo Script
 
+## Let's make a single request to the MCP Server
+```sh
+# Fire a single call to the flaky server and inspect the response body
+curl -si -X POST http://localhost:9000/mcp-stable \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call",
+       "params":{"name":"query_db","arguments":{}}}'
+```
 
 
 ```sh
