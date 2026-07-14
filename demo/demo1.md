@@ -28,6 +28,47 @@ data: {"jsonrpc":"2.0","id":1,"result":{
   "isError":true             ← the actual failure, buried
 }}
 ```
+### Send 50 requests to flaky mcp server
+Flaky server is with 2% protocol + 10% tool error rates
+```sh
+for i in {1..50}; do
+  # Step 1: initialize a session, capture the Mcp-Session-Id header
+  SID=$(curl -s -D - -o /dev/null -X POST http://localhost:9000/mcp-flaky \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json, text/event-stream" \
+    -d '{"jsonrpc":"2.0","id":1,"method":"initialize",
+         "params":{"protocolVersion":"2025-03-26","capabilities":{},
+                   "clientInfo":{"name":"curl-test","version":"1.0"}}}' \
+    | grep -i '^mcp-session-id:' | awk '{print $2}' | tr -d '\r\n')
+
+  if [ -z "$SID" ]; then
+    echo "attempt $i: no session id returned, skipping"
+    continue
+  fi
+
+  # Step 2: send the initialized notification (MCP requires this)
+  curl -s -o /dev/null -X POST http://localhost:9000/mcp-flaky \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json, text/event-stream" \
+    -H "Mcp-Session-Id: $SID" \
+    -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+
+  # Step 3: the actual tool call using the real session id
+  RESP=$(curl -s -w "|HTTP:%{http_code}" -X POST http://localhost:9000/mcp-flaky \
+    -H "Content-Type: application/json" \
+    -H "Accept: application/json, text/event-stream" \
+    -H "Mcp-Session-Id: $SID" \
+    -d '{"jsonrpc":"2.0","id":2,"method":"tools/call",
+         "params":{"name":"query_db","arguments":{}}}')
+
+  HTTP=$(echo "$RESP" | grep -oE 'HTTP:[0-9]+' | cut -d: -f2)
+  MCP="ok"
+  if echo "$RESP" | grep -q '"isError":true'; then MCP="TOOL_ERR"; fi
+  if echo "$RESP" | grep -q '"error":{'; then MCP="PROTO_ERR"; fi
+  echo "http=$HTTP  mcp=$MCP"
+done | sort | uniq -c
+```
+
 
 
 
