@@ -1,5 +1,5 @@
 # startup log
-```sh
+
 ubuntu@ip-10-1-1-4:~/nginx-mcp-js/demo$ docker compose up --build
 [+] Building 2.0s (25/25) FINISHED                                                                                                                                                                                                                                                                                     
  => [internal] load local bake definitions                                                                                                                                                                                                                                                                        0.0s
@@ -130,7 +130,7 @@ prometheus-1      | time=2026-07-14T09:25:04.406Z level=INFO source=main.go:1542
 prometheus-1      | time=2026-07-14T09:25:04.406Z level=INFO source=main.go:1582 msg="Completed loading of configuration file" db_storage=1.79µs remote_storage=2.761µs web_handler=1.06µs query_engine=1.98µs scrape=330.739µs scrape_sd=50.672µs notify=1.93µs notify_sd=1.5µs rules=2.35µs tracing=10.031µs filename=/etc/prometheus/prometheus.yml totalDuration=949.957µs
 prometheus-1      | time=2026-07-14T09:25:04.407Z level=INFO source=main.go:1316 msg="Server is ready to receive web requests."
 prometheus-1      | time=2026-07-14T09:25:04.407Z level=INFO source=manager.go:202 msg="Starting rule manager..." component="rule manager"
-nginx-1           | 2026/07/14 09:25:04 [notice] 1#1: js vm init njs: 00007FA5B7385C80
+**nginx-1           | 2026/07/14 09:25:04 [notice] 1#1: js vm init njs: 00007FA5B7385C80** #<- njs virtual machine loading — this is confirmation that mcp.js was successfully mounted and parsed. 
 nginx-1           | 2026/07/14 09:25:04 [notice] 1#1: using the "epoll" event method
 nginx-1           | 2026/07/14 09:25:04 [notice] 1#1: nginx/1.29.8
 nginx-1           | 2026/07/14 09:25:04 [notice] 1#1: built by gcc 15.2.0 (Alpine 15.2.0) 
@@ -537,6 +537,8 @@ Container demo-mcp-stable-1 Stopped
 mcp-stable-1 exited with code 2
 Container demo-mcp-flaky-1 Stopped 
 mcp-flaky-1 exited with code 2
+
+```sh
 ubuntu@ip-10-1-1-4:~/nginx-mcp-js/demo$ cat docker-compose.yaml 
 # Copyright (C) Dmitry Volyntsev
 # Copyright (C) F5, Inc.
