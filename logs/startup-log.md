@@ -1,5 +1,5 @@
 # startup log
-
+```log
 ubuntu@ip-10-1-1-4:~/nginx-mcp-js/demo$ docker compose up --build
 [+] Building 2.0s (25/25) FINISHED                                                                                                                                                                                                                                                                                     
  => [internal] load local bake definitions                                                                                                                                                                                                                                                                        0.0s
@@ -537,7 +537,7 @@ Container demo-mcp-stable-1 Stopped
 mcp-stable-1 exited with code 2
 Container demo-mcp-flaky-1 Stopped 
 mcp-flaky-1 exited with code 2
-
+```
 ```sh
 ubuntu@ip-10-1-1-4:~/nginx-mcp-js/demo$ cat docker-compose.yaml 
 # Copyright (C) Dmitry Volyntsev
