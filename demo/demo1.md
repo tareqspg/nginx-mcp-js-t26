@@ -388,4 +388,23 @@ data: {"jsonrpc":"2.0","id":1,"result":{
   "isError":true             ← the actual failure, buried
 }}
 The HTTP status is 200. The tool failed. No amount of standard HTTP monitoring will ever catch this. That's the point of mcp.js reading the body.
-The thorough way — a side-by-side Grafana panel. In Grafana, create one panel that queries the raw NGINX HTTP status metric (nginx_http_requests_total{status="5xx"}) and one that queries the mcp.js-derived metric (traces_spanmetrics_calls_total{mcp_tool_status="error"}). Put them next to each other. The first stays at zero forever. The second climbs steadily on flaky traffic. That's the visual proof that observability at the transport layer is blind and observability at the payload layer sees the truth. If I were pitching this internally, this is the single screenshot I'd use.
+The thorough way — a side-by-side Grafana panel. In Grafana, create one panel that queries the raw NGINX HTTP status metric (nginx_http_requests_total{status="5xx"}) and one that queries the mcp.js-derived metric (traces_spanmetrics_calls_total{mcp_tool_status="error"}). Put them next to each other. The first stays at zero forever. The second climbs steadily on flaky traffic. 
+
+Kcdkl quick
+Spanmetrics connector
+—-
+Why nginx 
+	⁃	already in path
+	⁃	No additional hop for traffic
+	⁃	Js based 
+—-
+mcp-client → nginx:9000 → [mcp-stable | mcp-flaky | mcp-sluggish]
+                ↓
+         otel-collector → prometheus → grafana
+—-
+
+|Server        |Port|Error Rate|Tool Error Rate|Latency          |
+|--------------|----|----------|---------------|-----------------|
+|`mcp-stable`  |9001|0%        |0%             |baseline         |
+|`mcp-flaky`   |9002|2%        |10%            |baseline         |
+|`mcp-sluggish`|9003|0%        |0%             |up to 100ms extra|
